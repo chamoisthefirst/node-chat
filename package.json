@@ -1,0 +1,24 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "chat app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "json:server": "json-server --watch storage.json"
+  },
+  "author": "Samuel J. Goehring",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.1",
+    "fs": "^0.0.1-security",
+    "json-server": "^1.0.0-alpha.23",
+    "socket.io": "^4.7.5",
+    "socketio": "^1.0.0"
+  },
+  "keywords": [
+    "test",
+    "data",
+    "chat"
+  ]
+}
