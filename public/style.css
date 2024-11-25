@@ -1,0 +1,82 @@
+.hidden{
+  display:none !important;
+}
+ 
+#chat{
+  overflow-y: schroll;
+}
+
+#chat::-webkit-scrollbar {
+  width:2em;
+}
+#chat::-webkit-scrollbar-track {
+  background: #000;
+}
+#chat::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+#main{
+  position: fixed;
+  left:0px;
+  top:0px;
+  /* width:calc(80vw + 19px); */
+  width:80vw;
+  height:99vh;
+  display: inline;
+  background: #000;
+}
+
+#side_pannel{
+  overflow:scroll;
+  position:fixed;
+  right:0px;
+  top:0px;
+  width:19vw;
+  height:100vh;
+  display: inline;
+  background: aliceblue;
+}
+
+#settings{
+  position: fixed;
+  top:0px;
+  left:0px;
+  width:100vw;
+  height:100vh;
+}
+
+#side_pannel::-webkit-scrollbar{
+  display:none !important;
+}
+
+
+
+.settings_option{
+    display:inline;
+}
+
+#rgb_slider1{
+  border-color:#000;
+  background-color: #888888;
+  width:max-content;
+}
+#rgb_slider2{
+  border-color:#000;
+  background-color: #888888;
+  width:max-content;
+}
+
+#chat_box{
+  width:70vw;
+  margin-left:4vw;
+  height:100vh;
+}
+#chat{
+  margin-top:5vh;
+  height:88vh;
+  background-color: #0001;
+}
+#input{
+ width:99%;
+}
