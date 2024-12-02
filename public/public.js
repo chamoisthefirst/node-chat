@@ -1,9 +1,55 @@
 const socket = io();
 
-
 //variable setup
 
 let channel = "0-0";
+
+
+// funcitons
+
+function readMessages(messages) {
+    console.log(messages);
+
+    for(let i = 0; i < messages.length; i++){
+
+        const span = document.createElement("span");
+        span.classList.add("message_span");
+
+        const message = document.createElement("p");
+        message.classList.add("message_content");
+        message.innerText = messages[i].content;
+
+        const header = document.createElement("div");
+        header.classList.add("message_header");
+
+        const author = document.createElement("p");
+        author.classList.add("message_author");
+        author.innerText = messages[i].user;
+
+        const timestamp = document.createElement("p");
+        timestamp.classList.add("message_timestamp");
+        timestamp.innerText = ` - ${Date(messages[i].timestamp)}`;
+
+        header.appendChild(author);
+        header.appendChild(timestamp);
+
+        span.appendChild(header);
+        span.appendChild(message);
+
+        if(i === messages.length-1){
+            span.id="final_message";
+        }
+
+        document.getElementById("chat").appendChild(span);
+    }
+
+    document.getElementById("final_message").scrollIntoView();
+}
+
+function serverList() {}
+
+
+
 
 //login stuff
 
@@ -25,10 +71,14 @@ let user = JSON.parse(sessionStorage[SERVERNAME]);
 socket.emit("autologin?",user);
 
 socket.on("login?", (usr)=>{
+
+    
     if(!usr.passes){
         window.location.replace(LOGINPATH);
     }
     user = usr;
+    console.log(user);
+    channel = user.channel.split("-");
 
     document.getElementById("settings").style.background = user.settings.gradient.main;
     document.getElementById("main").style.background = user.settings.gradient.main;
@@ -38,8 +88,8 @@ socket.on("login?", (usr)=>{
     document.getElementById("input").style.background = user.settings.gradient.secondary;
 
     resetSliders();
-
-    displayServers(usr.serverList);
+    
+    readMessages(user.servers[channel[1]].channels[channel[0]].messages);
 })
 
 function changeTheme(){
@@ -55,6 +105,29 @@ function toggleSettings(){
     }
 }
 
+let openedServer = 0;
+function openServer(server){
+
+}
+
+function displayServers(servers){
+    const serverList = document.getElementById("serverList");
+    for(let i = 0; i < servers.length; i++){
+        const server = document.createElement("button");
+        server.classList.add("server_button");
+        server.innerText = servers[i].name;
+        server.onclick = `openServer(${i})`;
+        for(let j = 0; j < servers.channels.length; j++){
+            const channel = document.createElement("button");
+            channel.classList.add("channel_button");
+            channel.innerText = servers.channels[i].name;
+
+            server.appendChild(channel);
+        }
+        serverList.appendChild(server);
+    }
+}
+
 //coloring and settings
 
 function signout(){
@@ -66,7 +139,6 @@ function signout(){
 
 function saveSettings(){
     socket.emit("settings",user);
-
 }
 
 
@@ -119,6 +191,10 @@ document.getElementById("custom_gradient_r2").onclick = () =>{updateColors(2);}
 document.getElementById("custom_gradient_g2").onclick = () =>{updateColors(2);}
 document.getElementById("custom_gradient_b2").onclick = () =>{updateColors(2);}
 
+function changeChannel(newChannelId){
+    user.channel = newChannelId;
+    saveSettings();
+}
 
 //messages
 function send(message){
@@ -134,20 +210,42 @@ function send(message){
 }
 
 socket.on("message", (msg)=>{
+
+    console.log("Incoming message");
+    console.log(msg);
+
+    let verify = `${parseInt(msg.channel.join())-parseInt(channel.join())}`;
+
+    if(verify != "0"){
+        console.log(verify)
+    }
     const span = document.createElement("span");
-    span.classList.add("message");
+    span.classList.add("message_span");
 
-    const msgHeader = document.createElement("p");
-    msgHeader.innerHTML = `<b>${msg.user}</b> - ${msg.timestamp}`;
+    const message = document.createElement("p");
+    message.classList.add("message_content");
+    message.innerText = msg.content;
 
-    const content = document.createElement("p");
-    content.classList.add("message_content");
-    content.innerText = msg.content;
+    const header = document.createElement("div");
+    header.classList.add("message_header");
 
-    span.appendChild(msgHeader);
-    span.appendChild(content);
+    const author = document.createElement("p");
+    author.classList.add("message_author");
+    author.innerText = msg.user;
+
+    const timestamp = document.createElement("p");
+    timestamp.classList.add("message_timestamp");
+    timestamp.innerText = ` - ${Date(msg.timestamp)}`;
+
+    header.appendChild(author);
+    header.appendChild(timestamp);
+
+    span.appendChild(header);
+    span.appendChild(message);
 
     document.getElementById("chat").appendChild(span);
+
+    span.scrollIntoView({ behavior: "smooth", block: "end" });
 })
 
 let downKey;
@@ -158,7 +256,17 @@ document.getElementById("input").onkeydown = (e) => {
 
 document.getElementById("input").onkeyup = (e) =>{
     if(e.key === "Enter" && downKey != "Shift"){
-        send(document.getElementById("input").value,channel.id);
+        send(document.getElementById("input").value);
         document.getElementById("input").value = "";
     }
 }
+
+
+
+socket.on("newChannel",(channel)=>{
+    if(document.getElementById("input").value){
+        sessionStorage.JSChatInput = document.getElementById("input").value;
+    }
+
+    window.location.reload();
+})
